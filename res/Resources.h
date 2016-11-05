@@ -5,6 +5,7 @@
 struct Resources
 {
 	static bool IsAppRunning;
+	static int DeltaTimeMilli;
 
 	static SDL_Texture* LoadTexture(std::string fileName, SDL_Renderer* rend);
 };

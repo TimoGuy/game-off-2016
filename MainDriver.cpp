@@ -13,6 +13,11 @@ SDL_Renderer* screenRenderer = NULL;
 // Images
 SDL_Texture* sampleImg = NULL;
 
+// Frames per second testing
+int ticks = 0;
+int frames = 0;
+int lastFrameTime = 0;
+
 int main(int argc, char** argv)
 {
 	printf("Let\'s start!!!\n");
@@ -56,10 +61,23 @@ int main(int argc, char** argv)
 		SDL_RenderClear(screenRenderer);
 
 		// Render texture to screen
-		SDL_RenderCopy(screenRenderer, sampleImg, NULL, NULL );
+		SDL_RenderCopy(screenRenderer, sampleImg, NULL, NULL);
 
 		// Update screen
 		SDL_RenderPresent(screenRenderer);
+
+		// Update the delta time
+		Resources::DeltaTimeMilli = SDL_GetTicks() - lastFrameTime;
+		lastFrameTime = SDL_GetTicks();
+
+		// Check the frames per second
+		frames++;
+		if (SDL_GetTicks() - ticks >= 1000)
+		{
+			printf("Fps: %d\tMilli: %d\n", frames, Resources::DeltaTimeMilli);
+			ticks = SDL_GetTicks();
+			frames = 0;
+		}
 	}
 
 	// End of program
@@ -70,7 +88,7 @@ int main(int argc, char** argv)
 bool init()
 {
 	// Initialize SDL
-	if (SDL_Init( SDL_INIT_VIDEO ) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 		return false;

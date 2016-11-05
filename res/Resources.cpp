@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 bool Resources::IsAppRunning = true;
+int Resources::DeltaTimeMilli = 0;
 
 SDL_Texture* Resources::LoadTexture(std::string fileName, SDL_Renderer* rend)
 {

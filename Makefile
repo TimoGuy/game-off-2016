@@ -1,5 +1,5 @@
 # Files to compile
-OBJS = MainDriver.cpp
+OBJS = MainDriver.cpp res/Resources.cpp
 
 # Compiler that we're using
 CC = g++

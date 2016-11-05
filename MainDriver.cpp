@@ -1,19 +1,17 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include "res/Resources.h"
 
 // Managing funcs
 bool init();
 bool loadMedia();
 void close();
 
-// The window we'll be rendering to
 SDL_Window* window = NULL;
-
-// The surface contained by the window
-SDL_Surface* screenSurface = NULL;
+SDL_Renderer* screenRenderer = NULL;
 
 // Images
-SDL_Surface* sampleImg = NULL;
+SDL_Texture* sampleImg = NULL;
 
 int main(int argc, char** argv)
 {
@@ -31,12 +29,38 @@ int main(int argc, char** argv)
 		return 2;
 	}
 
-	// Blit image!
-	SDL_BlitSurface(sampleImg, NULL, screenSurface, NULL);
-	SDL_UpdateWindowSurface(window);
+	// Main Event loop
+	SDL_Event e;
+	while (Resources::IsAppRunning)
+	{
+		// Handle events
+		while (SDL_PollEvent(&e) != 0)
+		{
+			switch (e.type)
+			{
+			// Close button
+			case SDL_QUIT:
+				Resources::IsAppRunning = false;
+				break;
 
-	// Wait for test!
-	SDL_Delay(2000);
+			// Keyboard input
+			case SDL_KEYDOWN:
+				break;
+
+			case SDL_KEYUP:
+				break;
+			}
+		}
+
+		// Clear screen
+		SDL_RenderClear(screenRenderer);
+
+		// Render texture to screen
+		SDL_RenderCopy(screenRenderer, sampleImg, NULL, NULL );
+
+		// Update screen
+		SDL_RenderPresent(screenRenderer);
+	}
 
 	// End of program
 	close();
@@ -65,13 +89,14 @@ bool init()
 		return false;
 	}
 
-	// Get window surface
-	screenSurface = SDL_GetWindowSurface(window);
-	if (screenSurface == NULL)
+	// Get window renderer
+	screenRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (screenRenderer == NULL)
 	{
-		printf("screenSurface wasn\'t created. SDL_Error: %s\n", SDL_GetError());
+		printf("screenRenderer wasn\'t created. SDL_Error: %s\n", SDL_GetError());
 		return false;
 	}
+	SDL_SetRenderDrawColor(screenRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
 	// Kannpeki!
 	return true;
@@ -80,7 +105,7 @@ bool init()
 bool loadMedia()
 {
 	// Load splash image
-	sampleImg = SDL_LoadBMP("res/img/JojosYolo.bmp");
+	sampleImg = Resources::LoadTexture("res/img/JojosYolo.bmp", screenRenderer);
 	if (sampleImg == NULL)
 	{
 		printf("Unable to load image. SDL_Error: %s\n", SDL_GetError());
@@ -94,11 +119,16 @@ bool loadMedia()
 void close()
 {
 	// Unpack
-	SDL_FreeSurface(screenSurface);
-	screenSurface = NULL;
+	SDL_DestroyTexture(sampleImg);
+	sampleImg = NULL;
 
+	SDL_DestroyRenderer(screenRenderer);
 	SDL_DestroyWindow(window);
+	screenRenderer = NULL;
 	window = NULL;
 
 	SDL_Quit();
+
+	// Program quit successfully!
+	printf("Program ended successfully!\n");
 }

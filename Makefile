@@ -1,5 +1,5 @@
 # Files to compile
-OBJS = MainDriver.cpp res/Resources.cpp
+OBJS = MainDriver.cpp res/Resources.cpp events/input/Input.cpp events/input/KeyboardInput.cpp
 
 # Compiler that we're using
 CC = g++

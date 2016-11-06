@@ -1,6 +1,9 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "res/Resources.h"
+#include "events/input/Input.h"
+#include "events/input/KeyboardInput.h"
+#include "events/EventHandler.h"
 
 // Managing funcs
 bool init();
@@ -34,6 +37,9 @@ int main(int argc, char** argv)
 		return 2;
 	}
 
+	// Add keyboard
+	EventHandler* evh = new KeyboardInput();
+
 	// Main Event loop
 	SDL_Event e;
 	while (Resources::IsAppRunning)
@@ -48,20 +54,24 @@ int main(int argc, char** argv)
 				Resources::IsAppRunning = false;
 				break;
 
-			// Keyboard input
-			case SDL_KEYDOWN:
-				break;
-
-			case SDL_KEYUP:
+			// Else
+			default:
+				evh->HandleEvent(&e);
 				break;
 			}
 		}
+
+		SDL_Rect texture_rect;
+		texture_rect.x = 0;  //the x coordinate
+		texture_rect.y = 0; // the y coordinate
+		texture_rect.w = 300; //the width of the texture
+		texture_rect.h = 200; //the height of the texture
 
 		// Clear screen
 		SDL_RenderClear(screenRenderer);
 
 		// Render texture to screen
-		SDL_RenderCopy(screenRenderer, sampleImg, NULL, NULL);
+		SDL_RenderCopy(screenRenderer, sampleImg, NULL, &texture_rect);
 
 		// Update screen
 		SDL_RenderPresent(screenRenderer);
@@ -115,6 +125,10 @@ bool init()
 		return false;
 	}
 	SDL_SetRenderDrawColor(screenRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	if (SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear") == SDL_FALSE)
+	{
+		printf("Linear filter didn\'t load. SDL_Error: %s\n", SDL_GetError());
+	}
 
 	// Kannpeki!
 	return true;

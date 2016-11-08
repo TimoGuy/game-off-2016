@@ -1,4 +1,5 @@
 #include "Resources.h"
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 
 bool Resources::IsAppRunning = true;
@@ -8,7 +9,7 @@ SDL_Texture* Resources::LoadTexture(std::string fileName, SDL_Renderer* rend)
 {
 	// Load surface
 	SDL_Texture* newTexture = NULL;
-	SDL_Surface* tempSurface = SDL_LoadBMP(fileName.c_str());
+	SDL_Surface* tempSurface = IMG_Load(fileName.c_str());
 	if (tempSurface == NULL)
 	{
 		printf("Unable to load image %s SDL_Error: %s\n",

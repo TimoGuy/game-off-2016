@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include "res/Resources.h"
 #include "events/input/Input.h"
@@ -20,6 +21,9 @@ SDL_Texture* sampleImg = NULL;
 int ticks = 0;
 int frames = 0;
 int lastFrameTime = 0;
+
+// Test vars
+double w = 0, h = 0;
 
 int main(int argc, char** argv)
 {
@@ -61,11 +65,31 @@ int main(int argc, char** argv)
 			}
 		}
 
+		// Update
+		double mvSpeed = 1.0 * (double)Resources::DeltaTimeMilli / 10.0;
+		// printf("%lf\n", mvSpeed);
+		if (Input::KeyStates & K_UP)
+		{
+			h -= mvSpeed;
+		}
+		else if (Input::KeyStates & K_DOWN)
+		{
+			h += mvSpeed;
+		}
+		else if (Input::KeyStates & K_LEFT)
+		{
+			w -= mvSpeed;
+		}
+		else if (Input::KeyStates & K_RIGHT)
+		{
+			w += mvSpeed;
+		}
+
 		SDL_Rect texture_rect;
 		texture_rect.x = 0;  //the x coordinate
 		texture_rect.y = 0; // the y coordinate
-		texture_rect.w = 300; //the width of the texture
-		texture_rect.h = 200; //the height of the texture
+		texture_rect.w = 512 + w; //the width of the texture
+		texture_rect.h = 512 + h; //the height of the texture
 
 		// Clear screen
 		SDL_RenderClear(screenRenderer);
@@ -103,6 +127,11 @@ bool init()
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 		return false;
 	}
+	int imgInitFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+	if (!(IMG_Init(imgInitFlags) & imgInitFlags))
+	{
+		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+	}
 
 	// Create the window
 	window = SDL_CreateWindow(
@@ -137,7 +166,8 @@ bool init()
 bool loadMedia()
 {
 	// Load splash image
-	sampleImg = Resources::LoadTexture("res/img/JojosYolo.bmp", screenRenderer);
+	// sampleImg = Resources::LoadTexture("res/img/JojosYolo.bmp", screenRenderer);
+	sampleImg = Resources::LoadTexture("res/img/landscape-1.jpg", screenRenderer);
 	if (sampleImg == NULL)
 	{
 		printf("Unable to load image. SDL_Error: %s\n", SDL_GetError());
@@ -159,6 +189,7 @@ void close()
 	screenRenderer = NULL;
 	window = NULL;
 
+	IMG_Quit();
 	SDL_Quit();
 
 	// Program quit successfully!
